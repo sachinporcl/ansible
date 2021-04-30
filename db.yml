@@ -1,0 +1,23 @@
+- hosts: db
+  become: yes
+  tasks:
+
+  - name: update repo cache and distro
+    apt:
+     update_cache: yes
+     upgrade: dist
+
+  - name: install mariadb
+    apt:
+     name: mariadb-server
+     state: latest
+
+  - name: open ports for maria db
+    iptables:
+     chain: INPUT
+     protocol: tcp
+     destination_port: 3306
+     jump: ACCEPT
+     action: insert
+     rule_num: 1
+

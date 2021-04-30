@@ -1,0 +1,60 @@
+- hosts: nextcloud
+  become: yes
+  tasks:
+  
+  - name: install apache, PHP, unzip, nano
+    apt:
+     name:
+     - apache2
+     - libapache2-mod-php7.4
+     - unzip
+     - nano
+
+  - name: install php modules
+    apt:
+     name:
+     - php7.4-gd
+     - php7.4-mysql
+     - php7.4-curl
+     - php7.4-mbstring
+     - php7.4-intl
+     - php7.4-zip
+     - php-imagick 
+     - php7.4-xml
+     - php7.4-bcmath
+     - php7.4-gmp
+
+  - name: Open port 80 on iptable
+    iptables:
+     chain: INPUT
+     protocol: tcp
+     destination_port: 80
+     jump: ACCEPT
+     action: insert
+     rule_num: 1
+
+  - name: fetch and unzip the nextcloud installer zip
+    unarchive:
+     src: https://download.nextcloud.com/server/releases/nextcloud-21.0.1.zip 
+     dest: /home/ubuntu/
+     remote_src: yes
+
+  - name: copy nextcloud files to apache server folder
+    copy:
+     src: /home/ubuntu/nextcloud/
+     dest: /var/www/html
+     mode: 0744
+     owner: www-data
+     group: www-data
+     remote_src: yes
+
+#  - name: copy nextcloud http config
+#    copy:
+#     src: /home/ubuntu/ansible/000-default.conf
+#     dest: /etc/apache2/sites-available/
+#     mode: 0644
+
+  - name: restart apache
+    service:
+     name: apache2
+     state: restarted
