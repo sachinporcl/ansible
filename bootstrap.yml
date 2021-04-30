@@ -5,3 +5,19 @@
   - name: update repository index
     apt:
       update_cache: yes
+
+  - name: upgrade all packages 
+    apt:
+      upgrade: dist
+
+  - name: Create user sachin
+    user:
+      name: sachin
+      shell: /bin/bash
+
+  - name: Copy public SSH keys
+    authorized_key:
+      user: sachin
+      state: present
+      key: https://raw.githubusercontent.com/sachinporcl/ansible/master/mykeys.key
+
